@@ -1,0 +1,9 @@
+test_id,category,request_type,execution_status,latency_ms,retry_count,trace_length,trace,success,error
+P01,READ_QUERY,READ_QUERY,SUCCESS,15839.8,0,5,request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,True,
+P02,READ_QUERY,READ_QUERY,SUCCESS,9162.13,0,5,request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,True,
+P03,READ_QUERY,READ_QUERY,SUCCESS,22018.92,0,5,request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,True,
+P04,READ_QUERY,READ_QUERY,SUCCESS,19977.13,0,5,request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,True,
+P05,READ_QUERY,READ_QUERY,SUCCESS,6948.57,0,5,request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,True,
+P06,POLICY,WRITE_REQUEST,NOT_EXECUTED,0.91,0,2,request_preflight → policy_response,True,
+P07,POLICY,SCHEMA_MISMATCH,NOT_EXECUTED,0.68,0,2,request_preflight → policy_response,True,
+P08,POLICY,AMBIGUOUS,NOT_EXECUTED,2.19,0,2,request_preflight → policy_response,True,

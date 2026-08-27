@@ -1,0 +1,6 @@
+test_id,question,expected_type,actual_type,execution,passed,trace
+S01,Which Nova Scotia facility has the highest occupancy rate?,SCHEMA_MISMATCH,SCHEMA_MISMATCH,NOT_EXECUTED,True,request_preflight → policy_response
+S02,Which facility is the most energy efficient?,AMBIGUOUS,AMBIGUOUS,NOT_EXECUTED,True,request_preflight → policy_response
+S03,Which facility in New Brunswick is the oldest building?,SCHEMA_MISMATCH,SCHEMA_MISMATCH,NOT_EXECUTED,True,request_preflight → policy_response
+S04,Which facility has the best overall performance?,AMBIGUOUS,AMBIGUOUS,NOT_EXECUTED,True,request_preflight → policy_response
+S05,What is the average annual water consumption of facilities in Nova Scotia?,SCHEMA_MISMATCH,SCHEMA_MISMATCH,NOT_EXECUTED,True,request_preflight → policy_response

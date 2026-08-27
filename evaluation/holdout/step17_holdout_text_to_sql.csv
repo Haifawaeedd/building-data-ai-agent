@@ -1,0 +1,68 @@
+test_id,question,request_type,validation,execution,retry_count,strict_match,semantic_match,generated_sql,trace,error
+H01,Which three cities in Newfoundland and Labrador have the most federal facility records?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT city, COUNT(*) AS record_count
+FROM federal_facilities_energy
+WHERE province = 'NL' AND city IS NOT NULL
+GROUP BY city
+ORDER BY record_count DESC, city ASC
+LIMIT 3;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H02,What is the total electricity-related emissions reported for each Atlantic province?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT
+  province,
+  SUM(emissions_electricity_t) AS total_emissions_electricity_t
+FROM federal_facilities_energy
+WHERE province IN ('NS','NB','NL','PE')
+  AND emissions_electricity_t IS NOT NULL
+GROUP BY province
+ORDER BY province;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H03,How many New Brunswick facility records report propane use?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT COUNT(*) AS nb_propane_reporting_records
+FROM federal_facilities_energy
+WHERE province = 'NB'
+  AND propane_l IS NOT NULL;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H04,Which federal organization has the largest number of facility records in Nova Scotia?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT federal_organization, COUNT(*) AS facility_count
+FROM federal_facilities_energy
+WHERE province = 'NS' AND federal_organization IS NOT NULL
+GROUP BY federal_organization
+ORDER BY facility_count DESC, federal_organization ASC
+LIMIT 1;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H05,What is the average building floor area among Newfoundland and Labrador facility records that report floor area?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT AVG(building_floor_area_m2) AS average_building_floor_area_m2
+FROM federal_facilities_energy
+WHERE province = 'NL'
+  AND building_floor_area_m2 IS NOT NULL;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H06,Which Prince Edward Island facility reports the highest electricity-related emissions?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT facility, emissions_electricity_t
+FROM federal_facilities_energy
+WHERE province = 'PE' AND emissions_electricity_t IS NOT NULL
+ORDER BY emissions_electricity_t DESC, facility ASC, record_id ASC
+LIMIT 1;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H07,How many distinct cities are represented in New Brunswick?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT COUNT(DISTINCT city) AS distinct_cities_nb
+FROM federal_facilities_energy
+WHERE province = 'NB' AND city IS NOT NULL;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H08,What is the total reported diesel use for each Atlantic province?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT province,
+       SUM(diesel_l) AS total_diesel_l
+FROM federal_facilities_energy
+WHERE province IN ('NS', 'NB', 'NL', 'PE')
+  AND diesel_l IS NOT NULL
+GROUP BY province
+ORDER BY province;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H09,Which three federal organizations report the highest total stationary-fuel emissions across Atlantic Canada?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT federal_organization,
+       SUM(emissions_stationary_fuels_t) AS total_stationary_fuels_t
+FROM federal_facilities_energy
+WHERE province IN ('NS','NB','NL','PE')
+  AND emissions_stationary_fuels_t IS NOT NULL
+  AND federal_organization IS NOT NULL
+GROUP BY federal_organization
+ORDER BY total_stationary_fuels_t DESC, federal_organization ASC
+LIMIT 3;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H10,How many Nova Scotia facility records report both total electricity and building floor area?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT COUNT(*) AS num_records
+FROM federal_facilities_energy
+WHERE province = 'NS'
+  AND electricity_total_kwh IS NOT NULL
+  AND building_floor_area_m2 IS NOT NULL;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H11,Which five facilities across Atlantic Canada report the highest clean electricity quantities?,READ_QUERY,VALID,SUCCESS,0,False,True,"SELECT facility, federal_organization, province, city, electricity_clean_kwh
+FROM federal_facilities_energy
+WHERE province IN ('NS','NB','NL','PE')
+  AND electricity_clean_kwh IS NOT NULL
+ORDER BY electricity_clean_kwh DESC, facility ASC, record_id ASC
+LIMIT 5;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,
+H12,What is the total conventional-grid electricity reported in New Brunswick?,READ_QUERY,VALID,SUCCESS,0,True,True,"SELECT SUM(electricity_conventional_kwh) AS total_conventional_grid_electricity_kwh
+FROM federal_facilities_energy
+WHERE province = 'NB'
+  AND electricity_conventional_kwh IS NOT NULL;",request_preflight → generate_sql → validate_sql → execute_sql → synthesize_answer,

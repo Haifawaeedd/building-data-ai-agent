@@ -1,0 +1,93 @@
+test_id,question,request_type,validation,execution,retry_count,result_match,generated_sql,error
+Q01,How many federal facility records are in Nova Scotia?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT COUNT(*) AS record_count
+FROM federal_facilities_energy
+WHERE province = 'NS';",
+Q02,How many federal facility records are in New Brunswick?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT COUNT(*) AS nb_record_count
+FROM federal_facilities_energy
+WHERE province = 'NB';",
+Q03,Which Atlantic province has the largest number of federal facility records?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT province, COUNT(*) AS record_count
+FROM federal_facilities_energy
+WHERE province IN ('NS', 'NB', 'NL', 'PE')
+GROUP BY province
+ORDER BY record_count DESC, province ASC
+LIMIT 1;",
+Q04,Which federal organization has the highest total reported electricity consumption across Atlantic Canada?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT federal_organization,
+       SUM(electricity_total_kwh) AS total_electricity_kwh
+FROM federal_facilities_energy
+WHERE province IN ('NS', 'NB', 'NL', 'PE')
+  AND federal_organization IS NOT NULL
+  AND electricity_total_kwh IS NOT NULL
+GROUP BY federal_organization
+ORDER BY total_electricity_kwh DESC, federal_organization ASC
+LIMIT 1;",
+Q05,Which facility in New Brunswick has the highest reported total electricity consumption?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT facility,
+       electricity_total_kwh
+FROM federal_facilities_energy
+WHERE province = 'NB'
+  AND electricity_total_kwh IS NOT NULL
+ORDER BY electricity_total_kwh DESC, facility ASC, record_id ASC
+LIMIT 1;",
+Q06,Which five facilities in Nova Scotia have the highest reported total electricity consumption?,READ_QUERY,VALID,SUCCESS,0,False,"SELECT
+  facility,
+  federal_organization,
+  city,
+  fiscal_year,
+  electricity_total_kwh
+FROM federal_facilities_energy
+WHERE province = 'NS'
+  AND electricity_total_kwh IS NOT NULL
+ORDER BY electricity_total_kwh DESC, facility ASC, record_id ASC
+LIMIT 5;",
+Q07,What is the total reported electricity consumption by Atlantic province?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT
+  province,
+  SUM(electricity_total_kwh) AS total_electricity_kwh
+FROM federal_facilities_energy
+WHERE province IN ('NS','NB','NL','PE')
+GROUP BY province
+ORDER BY province;",
+Q08,How many Newfoundland and Labrador facility records report natural gas consumption?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT COUNT(*) AS nl_natural_gas_records
+FROM federal_facilities_energy
+WHERE province = 'NL'
+  AND natural_gas_m3 IS NOT NULL;",
+Q09,How many distinct federal organizations have facilities in Prince Edward Island?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT COUNT(DISTINCT federal_organization) AS distinct_organizations_in_PE
+FROM federal_facilities_energy
+WHERE province = 'PE' AND federal_organization IS NOT NULL;",
+Q10,What is the average reported total electricity consumption for each Atlantic province?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT
+  province,
+  AVG(electricity_total_kwh) AS avg_total_electricity_kwh
+FROM federal_facilities_energy
+WHERE province IN ('NS','NB','NL','PE')
+  AND electricity_total_kwh IS NOT NULL
+GROUP BY province
+ORDER BY province;",
+Q11,How many federal facility records are located in the city of Halifax?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT COUNT(*) AS num_records_in_halifax
+FROM federal_facilities_energy
+WHERE trim(city) ILIKE 'Halifax';",
+Q12,Which three federal organizations have the highest total reported electricity consumption in Nova Scotia?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT
+  federal_organization,
+  SUM(electricity_total_kwh) AS total_electricity_kwh
+FROM
+  federal_facilities_energy
+WHERE
+  province = 'NS'
+  AND federal_organization IS NOT NULL
+GROUP BY
+  federal_organization
+HAVING
+  SUM(electricity_total_kwh) IS NOT NULL
+ORDER BY
+  total_electricity_kwh DESC,
+  federal_organization ASC
+LIMIT 3;",
+Q13,How many Nova Scotia facility records report clean electricity generation?,SCHEMA_MISMATCH,,NOT_EXECUTED,0,False,,
+Q14,Which facility in Newfoundland and Labrador has the highest reported electricity-related emissions?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT facility, emissions_electricity_t
+FROM federal_facilities_energy
+WHERE province = 'NL'
+  AND emissions_electricity_t IS NOT NULL
+ORDER BY emissions_electricity_t DESC, facility ASC
+LIMIT 1;",
+Q15,Which Nova Scotia facility has the largest reported building floor area?,READ_QUERY,VALID,SUCCESS,0,True,"SELECT facility, building_floor_area_m2
+FROM federal_facilities_energy
+WHERE province = 'NS' AND building_floor_area_m2 IS NOT NULL
+ORDER BY building_floor_area_m2 DESC, facility ASC, record_id ASC
+LIMIT 1;",

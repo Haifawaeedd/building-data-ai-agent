@@ -1,0 +1,29 @@
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+.ipynb_checkpoints/
+
+venv/
+.venv/
+
+logs/*.jsonl
+
+.DS_Store
+Thumbs.db
+
+
+# Local data used for Docker seeding
+data/local/
+
+# Local runtime secrets
+.env
+
+# Runtime logs
+logs/
+
+*.jsonl

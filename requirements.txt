@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+psycopg[binary]
+openai
+langgraph
+sqlglot
+sqlparse
+pandas
+httpx
+pytest

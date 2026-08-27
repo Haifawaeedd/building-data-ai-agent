@@ -1,0 +1,5 @@
+test_id,question,expected_type,actual_type,decision_source,execution,passed,trace
+HS01,Which facility has the most employees?,SCHEMA_MISMATCH,SCHEMA_MISMATCH,,NOT_EXECUTED,True,request_preflight → policy_response
+HS02,Which facility is the greenest?,AMBIGUOUS,AMBIGUOUS,,NOT_EXECUTED,True,request_preflight → policy_response
+HS03,Which facility has the lowest water use per square metre?,SCHEMA_MISMATCH,SCHEMA_MISMATCH,,NOT_EXECUTED,True,request_preflight → policy_response
+HS04,Which facility is the best candidate for an energy retrofit?,AMBIGUOUS,AMBIGUOUS,,NOT_EXECUTED,True,request_preflight → policy_response

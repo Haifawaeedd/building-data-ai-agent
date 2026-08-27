@@ -1,0 +1,153 @@
+services:
+
+  db:
+
+    image: postgres:16
+
+    container_name:
+      building-data-postgres
+
+    environment:
+
+      POSTGRES_DB:
+        ${POSTGRES_DB}
+
+      POSTGRES_USER:
+        ${POSTGRES_USER}
+
+      POSTGRES_PASSWORD:
+        ${POSTGRES_PASSWORD}
+
+    volumes:
+
+      - building_agent_pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+
+      interval: 5s
+
+      timeout: 5s
+
+      retries: 20
+
+    restart:
+      unless-stopped
+
+
+  loader:
+
+    build:
+      context: .
+
+    container_name:
+      building-data-loader
+
+    command:
+      [
+        "python",
+        "scripts/load_data.py"
+      ]
+
+    environment:
+
+      ADMIN_DATABASE_URL:
+        postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+
+      READONLY_DATABASE_URL:
+        postgresql://readonly_agent:${READONLY_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+
+      READONLY_DB_PASSWORD:
+        ${READONLY_DB_PASSWORD}
+
+      SOURCE_CSV_PATH:
+        /data/source.csv
+
+    volumes:
+
+      - ./data/local/source.csv:/data/source.csv:ro
+
+    depends_on:
+
+      db:
+
+        condition:
+          service_healthy
+
+
+  app:
+
+    build:
+      context: .
+
+    container_name:
+      building-data-api
+
+    environment:
+
+      DATABASE_URL:
+        postgresql://readonly_agent:${READONLY_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+
+      OPENAI_API_KEY:
+        ${OPENAI_API_KEY}
+
+      OPENAI_MODEL:
+        ${OPENAI_MODEL}
+
+      MAX_SQL_RETRIES:
+        ${MAX_SQL_RETRIES}
+
+      STATEMENT_TIMEOUT_MS:
+        ${STATEMENT_TIMEOUT_MS}
+
+      MAX_RESULT_ROWS:
+        ${MAX_RESULT_ROWS}
+
+      PROVENANCE_LOG_PATH:
+        /app/logs/agent_provenance_ledger.jsonl
+
+    ports:
+
+      - "8000:8000"
+
+    volumes:
+
+      - ./logs:/app/logs
+
+    depends_on:
+
+      loader:
+
+        condition:
+          service_completed_successfully
+
+    healthcheck:
+
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"
+        ]
+
+      interval: 10s
+
+      timeout: 5s
+
+      retries: 12
+
+      start_period: 10s
+
+    restart:
+      unless-stopped
+
+
+volumes:
+
+  building_agent_pgdata:
