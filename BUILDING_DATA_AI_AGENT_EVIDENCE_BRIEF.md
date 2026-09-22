@@ -1,4 +1,4 @@
-# Building Data AI Agent — Portfolio and PhD Evidence Brief
+# Building Data AI Agent — Technical Portfolio Evidence Brief
 
 ## Portfolio entry
 
@@ -26,9 +26,9 @@ Built a bounded LangGraph Text-to-SQL research prototype with read-only PostgreS
 - Implemented trace-based outcome diagnosis and operational metrics for safe containment, repair use, latency, and component failures; five focused v2 diagnostic tests pass in the repository's lightweight CI scope.
 - Recorded narrow hold-out evidence: 12/12 successful analytical executions, 11/12 strict full-result agreement, and 0/5 write-oriented prompts reaching database execution; results are limited to the documented schema, dataset, task distribution, and runtime.
 
-## PhD-application paragraph
+## Research direction
 
-My Building Data AI Agent project explores how trustworthy AI principles can govern systems that translate model outputs into executable actions. I designed an explicit control harness around the LLM, including semantic routing, live environmental grounding, structural SQL validation, read-only tool permissions, bounded repair, trace-based diagnosis, and provenance. I also separated semantic classification from behavioral containment: in the recorded write-request hold-out, one prompt received the wrong policy label, yet none generated SQL or reached the database. This distinction reflects the research question I want to develop further in doctoral work: how can agent permissions and claims be calibrated to the strength of available policy, validation, provenance, and runtime evidence?
+My Building Data AI Agent project explores how trustworthy AI principles can govern systems that translate model outputs into executable actions. I designed an explicit control harness around the LLM, including semantic routing, live environmental grounding, structural SQL validation, read-only tool permissions, bounded repair, trace-based diagnosis, and provenance. I also separated semantic classification from behavioral containment: in the recorded write-request hold-out, one prompt received the wrong policy label, yet none generated SQL or reached the database. This distinction motivates a broader research direction: how can agent permissions and claims be calibrated to the strength of available policy, validation, provenance, and runtime evidence?
 
 ## Claim-evidence matrix
 
