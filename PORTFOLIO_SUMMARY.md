@@ -14,7 +14,7 @@ The project emphasizes evidence-bounded engineering rather than unrestricted aut
 - Demonstrated execution containment on five write-oriented hold-out prompts: 0/5 generated SQL or reached database execution, although only 4/5 received the intended `WRITE_REQUEST` label.
 - Documented material limits, including a small hold-out, LLM nondeterminism, domain-specific policies, high interactive latency, and the absence of penetration testing, security certification, or production-scale load validation.
 
-## PhD-application framing
+## Research direction
 
 This project demonstrates my interest in trustworthy AI systems at the boundary between model behavior and executable tools. Rather than treating a successful answer as sufficient evidence, I designed the agent to expose routing decisions, validation status, execution state, repair count, latency, failure category, and provenance. The evaluation distinguishes semantic classification from behavioral containment and preserves observed failures instead of rewriting the benchmark after inspection. This prototype motivates a broader research direction: how to assign execution and answer permissions to AI agents in proportion to the schema, policy, validation, and runtime evidence available to them.
 
