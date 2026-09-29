@@ -230,7 +230,8 @@ app/
 ├── agent.py              # LangGraph execution harness
 ├── config.py
 ├── database.py           # read-only tool boundary
-├── answer_licensing.py   # result evidence and answer licensing\n├── diagnostics.py        # v2 outcome/failure classification + metrics
+├── answer_licensing.py   # result evidence and answer licensing
+├── diagnostics.py        # v2 outcome/failure classification + metrics
 ├── guardrails.py         # sqlglot AST and allowlist checks
 ├── main.py               # FastAPI surface
 ├── observability.py      # request IDs, traces, latency, diagnosis
@@ -243,7 +244,8 @@ notebooks/
 
 tests/
 ├── test_api.py
-├── test_answer_licensing.py\n├── test_diagnostics.py
+├── test_answer_licensing.py
+├── test_diagnostics.py
 ├── test_guardrails.py
 └── test_routing.py
 
