@@ -4,7 +4,6 @@ from typing import (
     Any
 )
 
-import pandas as pd
 from openai import OpenAI
 
 from langgraph.graph import (
@@ -15,6 +14,11 @@ from langgraph.graph import (
 from app.config import (
     settings,
     require_openai_key
+)
+
+from app.answer_licensing import (
+    evaluate_answer_license,
+    render_result_table,
 )
 
 from app.database import (
@@ -205,71 +209,6 @@ Return the corrected SQL.
     )
 
 
-def synthesize_answer(
-    question,
-    sql,
-    result_df
-):
-
-    records = (
-        result_df
-        .to_dict(
-            orient="records"
-        )
-    )
-
-
-    instructions = """
-You are the answer-synthesis component of a
-database-grounded AI system.
-
-Use ONLY the supplied database result.
-
-Rules:
-
-1. Do not add unsupported facts.
-2. Do not invent missing values.
-3. If the result is empty, state that no matching
-   records were found.
-4. Keep the answer concise.
-5. Preserve units shown by the database context.
-"""
-
-
-    payload = {
-
-        "question":
-            question,
-
-        "sql":
-            sql,
-
-        "database_result":
-            records
-    }
-
-
-    response = _client().responses.create(
-
-        model=
-            settings.openai_model,
-
-        instructions=
-            instructions,
-
-        input=
-            json.dumps(
-                payload,
-                default=str
-            )
-    )
-
-
-    return (
-        response.output_text
-        .strip()
-    )
-
 
 def execute_sql_bounded(
     sql
@@ -331,6 +270,11 @@ class BuildingAgentState(
     repair_reason: str
 
     answer: str
+    answer_license: str
+    answer_evidence: list[dict[str, Any]]
+    verification_checks: list[dict[str, Any]]
+    withholding_reason: str
+    license_scope: str
 
     trace: list[str]
 
@@ -405,89 +349,40 @@ def route_after_preflight(
 def node_policy_response(
     state
 ):
-    """
-    Formatting-only cleanup compared with notebook:
-    SCHEMA_MISMATCH text is not duplicated.
-    """
-
-    request_type = (
-        state.get(
-            "request_type"
-        )
-    )
-
+    """Return a policy or clarification response without licensing it as data."""
+    request_type = state.get("request_type")
 
     if request_type == "WRITE_REQUEST":
-
         answer = (
-            "This agent provides read-only access "
-            "to facility data and cannot modify, "
-            "delete, insert, or alter database "
-            "records."
+            "This agent provides read-only access to facility data and cannot "
+            "modify, delete, insert, or alter database records."
         )
-
-
     elif request_type == "SCHEMA_MISMATCH":
-
-        clarification = (
-            state.get(
-                "clarification",
-                ""
-            )
-            .strip()
-        )
-
-
         answer = (
-            clarification
-            if clarification
-            else
-            (
-                "The requested information is not "
-                "available in the current dataset."
-            )
+            state.get("clarification", "").strip()
+            or "The requested information is not available in the current dataset."
         )
-
-
     elif request_type == "AMBIGUOUS":
-
         answer = (
-            state.get(
-                "clarification"
-            )
-            or
-            (
-                "Please clarify the requested "
-                "metric."
-            )
+            state.get("clarification")
+            or "Please clarify the requested metric."
         )
-
-
     else:
+        answer = "The request cannot be safely processed."
 
-        answer = (
-            "The request cannot be safely "
-            "processed."
-        )
-
-
+    decision = evaluate_answer_license(
+        request_type=request_type,
+        validation_status=None,
+        execution_status="NOT_EXECUTED",
+        rows=[],
+    )
     return {
-
-        "answer":
-            answer,
-
-        "execution_status":
-            "NOT_EXECUTED",
-
-        "trace":
-            state.get(
-                "trace",
-                []
-            )
-            + [
-                "policy_response"
-            ]
+        "answer": answer,
+        "execution_status": "NOT_EXECUTED",
+        **decision,
+        "trace": state.get("trace", []) + ["policy_response"],
     }
+
 
 
 def node_generate_sql(
@@ -775,106 +670,73 @@ def node_repair_sql(
 def node_synthesize_answer(
     state
 ):
-
-    result_df = pd.DataFrame(
-        state.get(
-            "rows",
-            []
-        )
+    decision = evaluate_answer_license(
+        request_type=state.get("request_type"),
+        validation_status=state.get("validation_status"),
+        execution_status=state.get("execution_status"),
+        rows=state.get("rows"),
+        result_truncated=state.get("result_truncated", False),
     )
 
-
-    answer = synthesize_answer(
-
-        state[
-            "question"
-        ],
-
-        state[
-            "sql"
-        ],
-
-        result_df
-    )
-
-
-    if state.get(
-        "result_truncated",
-        False
-    ):
-
-        answer += (
-            "\n\nNote: the database result "
-            f"exceeded {settings.max_result_rows} "
-            "rows and was truncated."
+    if decision["answer_license"] == "WITHHELD":
+        answer = (
+            "Answer withheld: "
+            + (decision["withholding_reason"] or "the result was not verifiable.")
         )
-
+    else:
+        answer = render_result_table(
+            state.get("rows", []),
+            result_truncated=state.get("result_truncated", False),
+        )
 
     return {
-
-        "answer":
-            answer,
-
-        "trace":
-            state.get(
-                "trace",
-                []
-            )
-            + [
-                "synthesize_answer"
-            ]
+        "answer": answer,
+        **decision,
+        "trace": state.get("trace", []) + ["render_evidence_checked_answer"],
     }
+
 
 
 def node_blocked_answer(
     state
 ):
-
+    decision = evaluate_answer_license(
+        request_type=state.get("request_type"),
+        validation_status=state.get("validation_status"),
+        execution_status="BLOCKED",
+        rows=[],
+        result_truncated=False,
+    )
     return {
-
-        "answer":
-            (
-                "The query could not be safely "
-                "validated after the allowed "
-                "repair attempt."
-            ),
-
-        "execution_status":
-            "BLOCKED",
-
-        "trace":
-            state.get(
-                "trace",
-                []
-            )
-            + [
-                "blocked_answer"
-            ]
+        "answer": (
+            "The query could not be safely validated after the allowed repair attempt."
+        ),
+        "execution_status": "BLOCKED",
+        **decision,
+        "trace": state.get("trace", []) + ["blocked_answer"],
     }
+
 
 
 def node_database_error(
     state
 ):
-
+    decision = evaluate_answer_license(
+        request_type=state.get("request_type"),
+        validation_status=state.get("validation_status"),
+        execution_status="ERROR",
+        rows=[],
+        result_truncated=False,
+    )
     return {
-
-        "answer":
-            (
-                "The database query could not be "
-                "completed after the allowed "
-                "repair attempt."
-            ),
-
-        "trace":
-            state.get(
-                "trace",
-                []
-            )
-            + [
-                "database_error"
-            ]
+        "answer": (
+            "The database query could not be completed after the allowed repair attempt."
+        ),
+        "execution_status": "ERROR",
+        **decision,
+        "trace": state.get("trace", []) + ["database_error"],
     }
+
 
 
 def build_agent():

@@ -317,6 +317,14 @@ def build_provenance_ledger(
                 )
         },
 
+        "answer_license": {
+            "status": result.get("answer_license"),
+            "checks": result.get("verification_checks", []),
+            "evidence": result.get("answer_evidence", []),
+            "withholding_reason": result.get("withholding_reason"),
+            "scope": result.get("license_scope"),
+        },
+
         "performance": {
 
             "latency_ms":

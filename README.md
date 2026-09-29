@@ -128,6 +128,25 @@ API responses can expose:
 
 This turns traces into actionable engineering signals rather than raw logs only.
 
+### Result-supported answer licensing — v0.3
+
+Successful database reads are returned as deterministic result tables rather than
+free-form LLM summaries. The API labels them `RESULT_SUPPORTED` when the
+displayed rows are complete, or `RESULT_BOUNDED` when retrieval or presentation
+limits apply. It withholds data answers when SQL validation or execution fails.
+Policy and clarification messages are labeled `NOT_APPLICABLE`.
+
+Each response includes cell-level references to the displayed database rows and
+the checks used for the license decision. These checks verify that displayed
+values came from an executed, validated read query; they do not independently
+prove that the generated SQL captured the user's intended meaning.
+
+Run the deterministic fixture evaluation with:
+
+```bash
+python evaluation/run_answer_licensing.py
+```
+
 ### Auditable provenance
 
 The provenance path can record:
@@ -211,7 +230,7 @@ app/
 ├── agent.py              # LangGraph execution harness
 ├── config.py
 ├── database.py           # read-only tool boundary
-├── diagnostics.py        # v2 outcome/failure classification + metrics
+├── answer_licensing.py   # result evidence and answer licensing\n├── diagnostics.py        # v2 outcome/failure classification + metrics
 ├── guardrails.py         # sqlglot AST and allowlist checks
 ├── main.py               # FastAPI surface
 ├── observability.py      # request IDs, traces, latency, diagnosis
@@ -224,7 +243,7 @@ notebooks/
 
 tests/
 ├── test_api.py
-├── test_diagnostics.py
+├── test_answer_licensing.py\n├── test_diagnostics.py
 ├── test_guardrails.py
 └── test_routing.py
 
