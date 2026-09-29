@@ -6,6 +6,14 @@ Building Data AI Agent is a containerized natural-language interface to structur
 
 The current prototype operates over **535 real Government of Canada Atlantic facility records for FY2024-25**.
 
+## Offline safety replay
+
+Which SQL guardrail actually blocks a candidate, and what changes if one layer is removed?
+
+The [safety replay](docs/SAFETY_REPLAY.md) evaluates the existing lexical and AST validators independently on the same fixed SQL, then reports redundant blocks, dependence on one layer, false rejections, and unblocked policy test cases. It runs without an API key, Docker, or the original dataset.
+
+The committed [13-case synthetic report](evaluation/safety_replay/report.md) includes failures, not just successful blocks. This is validator analysis, not live database validation or a claim of novel research.
+
 ## Why this is an agent system
 
 A prompt wrapper mainly performs:
@@ -295,3 +303,4 @@ This remains a research-oriented engineering prototype, not a security-certified
 > A language model should not receive a stronger execution or answer license than the available schema, policy, validation, and database evidence support.
 
 The goal is not merely to generate SQL. It is to make natural-language database access **bounded, inspectable, diagnosable, testable, and auditable**.
+
