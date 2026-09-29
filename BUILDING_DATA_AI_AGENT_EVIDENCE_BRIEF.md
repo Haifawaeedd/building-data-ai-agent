@@ -51,5 +51,6 @@ My Building Data AI Agent project explores how trustworthy AI principles can gov
 ## Reproducibility anchors
 
 - Repository: `Haifawaeedd/building-data-ai-agent`
-- PR under review: #2 on `docs/portfolio-evidence-brief`\n- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
+- PR under review: #2 on `docs/portfolio-evidence-brief`
+- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
 - Evidence files: `README.md`, `docs/EVALUATION.md`, `.github/workflows/ci.yml`, `app/diagnostics.py`, `tests/test_diagnostics.py`, `evaluation/`, and `notebooks/Building_Data_AI_Agent_Production_v2.ipynb`
