@@ -247,7 +247,18 @@ Current Atlantic subset:
 - Total: **535 records**
 - Fiscal year: **FY2024-25**
 
-Source: https://open.canada.ca/data/en/dataset/6bed41cd-9816-4912-a2b8-b0b224909396
+### Data source and licence
+
+This project uses an Atlantic Canada subset derived from the following Government of Canada open dataset:
+
+- **Dataset:** Government of Canada’s Greenhouse Gas Emissions Inventory
+- **Resource:** Item 4 — Energy Use Related to Individual Federal Facilities
+- **Fiscal year:** FY2024–25
+- **Publisher:** Treasury Board of Canada Secretariat
+- **Source:** https://open.canada.ca/data/en/dataset/6bed41cd-9816-4912-a2b8-b0b224909396
+- **Licence:** [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada)
+
+The data is adapted for this independent research and portfolio prototype. This use does not constitute an endorsement by the Government of Canada or the Treasury Board of Canada Secretariat.
 
 The source CSV is intentionally not committed.
 
