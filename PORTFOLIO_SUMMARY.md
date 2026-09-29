@@ -20,19 +20,24 @@ This project demonstrates my interest in trustworthy AI systems at the boundary 
 
 ## Evidence boundary
 
-### Directly demonstrated by the merged repository
+### Direct evidence in source code and focused CI
 
-- Implemented diagnostic classifier and run-summary metrics in `app/diagnostics.py`.
-- API fields for outcome category, failure category, recommended fix, and trace depth.
-- A GitHub Actions workflow that compiles `app` and `tests` and runs `tests/test_diagnostics.py` on Python 3.11.
-- Five focused diagnostic tests covering successful reads, safe write containment, exhausted repair, latency-budget classification, and operational aggregation.
-- Repository artifacts for frozen benchmark, hold-out, and performance results, plus a secret-safe portfolio notebook.
-- An explicit statement that v2 diagnostic tests are separate from the previously reported 11/11 containerized regression result.
+- The source defines the diagnostic classifier and run-summary metrics in `app/diagnostics.py`.
+- The API exposes outcome category, failure category, recommended fix, and trace depth.
+- The GitHub Actions workflow compiles `app` and `tests`, then runs `tests/test_diagnostics.py` on Python 3.11.
+- Five focused diagnostic tests cover successful reads, safe write containment, exhausted repair, latency-budget classification, and operational aggregation. The PR-head CI run passed these checks; this is focused validation, not a full v2 end-to-end run.
+- The repository states that v2 diagnostic tests are separate from the previously reported 11/11 containerized regression result.
 
-### Recorded evidence that remains environment-dependent
+### Limited recorded experimental results
 
-- The 11/11 containerized regression result and full Docker-stack checks are documented pre-v2 results; the repository does not claim that the updated v2 stack was rerun end to end.
-- Hold-out and latency numbers are recorded experimental results, not independently reproducible without the source CSV, PostgreSQL stack, configuration, model access, and compatible runtime.
+- Repository artifacts report 12/12 successful analytical hold-out executions, 12/12 answer-contract agreement, and 11/12 strict full-result agreement on a 12-question hold-out.
+- Five recorded write-oriented prompts generated no SQL and reached no database execution; 4/5 received the intended `WRITE_REQUEST` label.
+- The 11/11 containerized regression result and full Docker-stack checks are historical pre-v2 results, not a rerun of the updated v2 stack.
+- Hold-out, regression, and latency figures are recorded outcomes for specific samples and configurations. The small hold-out and recorded setup limit what they establish.
+
+### Environment-dependent validation and limits
+
+- Independently reproducing the hold-out and latency results requires the source CSV, PostgreSQL stack, configuration, model access, and a compatible runtime.
 - Read-only enforcement depends on deployed PostgreSQL roles, grants, transaction settings, and timeouts being configured as documented.
 - Live schema introspection, real Text-to-SQL execution, bounded repair, answer synthesis, and provenance generation require the external database and model services.
 - No repository evidence establishes penetration-test coverage, formal security certification, arbitrary-database generalization, deterministic LLM behavior, or production-scale reliability.
@@ -47,5 +52,5 @@ Do not describe this project as “production-proven,” “security-certified,�
 
 ## Evidence anchors
 
-- Merged commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
+- PR under review: #2 on `docs/portfolio-evidence-brief`\n- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
 - Primary evidence: `README.md`, `docs/EVALUATION.md`, `.github/workflows/ci.yml`, `app/diagnostics.py`, `tests/test_diagnostics.py`, and `evaluation/`
