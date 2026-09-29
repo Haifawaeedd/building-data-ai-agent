@@ -1,0 +1,419 @@
+{
+  "format_version": 1,
+  "scope": "offline_fixed_sql_validator_ablation",
+  "sql_executed": false,
+  "excluded": [
+    "semantic_router",
+    "LLM_generation",
+    "repair",
+    "database_enforcement",
+    "answer_correctness"
+  ],
+  "schema_origin": "Synthetic minimal snapshot; not a live PostgreSQL inspection",
+  "input_sha256": "8c0a4f475e3f38797f1ce8df097ce31bbc992e533001b3d1b1e1c7232be3a619",
+  "schema_sha256": "575971be6e4369b69b1649e242f85bfd1e9f51b0dffcd987807c4c19efef7899",
+  "guardrails_sha256": "972a1a89c4e3fd3490ea86326d3087c245ab289d4a11766c57300c1c12977fcc",
+  "replay_sha256": "9fb4485f54109b13c5eb6efcba8a249b25b48b80dc58f5834d627fb514f4a701",
+  "dependencies": {
+    "sqlglot": "30.20.0",
+    "sqlparse": "0.6.0"
+  },
+  "summary": {
+    "full": {
+      "cases": 13,
+      "expected_block_cases": 8,
+      "expected_pass_cases": 5,
+      "missed_blocks": 1,
+      "false_blocks": 1,
+      "unknown": 0,
+      "evaluator_error_cases": 0
+    },
+    "without_lexical": {
+      "cases": 13,
+      "expected_block_cases": 8,
+      "expected_pass_cases": 5,
+      "missed_blocks": 1,
+      "false_blocks": 0,
+      "unknown": 0,
+      "evaluator_error_cases": 0
+    },
+    "without_ast": {
+      "cases": 13,
+      "expected_block_cases": 8,
+      "expected_pass_cases": 5,
+      "missed_blocks": 4,
+      "false_blocks": 1,
+      "unknown": 0,
+      "evaluator_error_cases": 0
+    },
+    "without_both": {
+      "cases": 13,
+      "expected_block_cases": 8,
+      "expected_pass_cases": 5,
+      "missed_blocks": 8,
+      "false_blocks": 0,
+      "unknown": 0,
+      "evaluator_error_cases": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "count",
+      "sql": "SELECT COUNT(*) FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "Aggregate read of an allowed table.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "PASS",
+        "without_lexical": "PASS",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [],
+      "attribution": "NO_VALIDATOR_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "province",
+      "sql": "SELECT province FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "Known column.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "PASS",
+        "without_lexical": "PASS",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [],
+      "attribution": "NO_VALIDATOR_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "cte",
+      "sql": "WITH f AS (SELECT province FROM federal_facilities_energy) SELECT province FROM f",
+      "expected": "PASS",
+      "rationale": "Read-only CTE.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "PASS",
+        "without_lexical": "PASS",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [],
+      "attribution": "NO_VALIDATOR_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "comment",
+      "sql": "SELECT province FROM federal_facilities_energy -- DELETE",
+      "expected": "PASS",
+      "rationale": "A comment does not perform deletion.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "PASS",
+        "without_lexical": "PASS",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [],
+      "attribution": "NO_VALIDATOR_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "literal",
+      "sql": "SELECT 'DELETE' AS label FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "A string literal does not perform deletion.",
+      "checks": {
+        "lexical": {
+          "decision": "BLOCK",
+          "reason": "BLOCKED_KEYWORD_DELETE"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "PASS",
+        "without_ast": "BLOCK",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "lexical"
+      ],
+      "attribution": "SINGLE_BLOCKING_LAYER",
+      "full_matches_expectation": false,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "delete",
+      "sql": "DELETE FROM federal_facilities_energy",
+      "expected": "BLOCK",
+      "rationale": "State-changing statement.",
+      "checks": {
+        "lexical": {
+          "decision": "BLOCK",
+          "reason": "ONLY_SELECT_OR_WITH_ALLOWED"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "BLOCKED_AST_NODE_DELETE"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "BLOCK",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "lexical",
+        "ast"
+      ],
+      "attribution": "REDUNDANT_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "write_cte",
+      "sql": "WITH x AS (DELETE FROM federal_facilities_energy RETURNING *) SELECT * FROM x",
+      "expected": "BLOCK",
+      "rationale": "Data-modifying CTE.",
+      "checks": {
+        "lexical": {
+          "decision": "BLOCK",
+          "reason": "BLOCKED_KEYWORD_DELETE"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "BLOCKED_AST_NODE_DELETE"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "BLOCK",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "lexical",
+        "ast"
+      ],
+      "attribution": "REDUNDANT_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "multi",
+      "sql": "SELECT 1; SELECT 2",
+      "expected": "BLOCK",
+      "rationale": "Multiple statements violate policy.",
+      "checks": {
+        "lexical": {
+          "decision": "BLOCK",
+          "reason": "MULTIPLE_STATEMENTS_NOT_ALLOWED"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "MULTIPLE_STATEMENTS_NOT_ALLOWED"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "BLOCK",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "lexical",
+        "ast"
+      ],
+      "attribution": "REDUNDANT_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "unknown_table",
+      "sql": "SELECT * FROM other_table",
+      "expected": "BLOCK",
+      "rationale": "Table outside the allowlist.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "UNKNOWN_TABLES: other_table"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "ast"
+      ],
+      "attribution": "SINGLE_BLOCKING_LAYER",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "unknown_column",
+      "sql": "SELECT imaginary FROM federal_facilities_energy",
+      "expected": "BLOCK",
+      "rationale": "Column absent from frozen schema.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "UNKNOWN_COLUMNS: imaginary"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "ast"
+      ],
+      "attribution": "SINGLE_BLOCKING_LAYER",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "system_schema",
+      "sql": "SELECT * FROM pg_catalog.pg_tables",
+      "expected": "BLOCK",
+      "rationale": "Unapproved schema.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "SYSTEM_OR_UNAPPROVED_SCHEMA"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "ast"
+      ],
+      "attribution": "SINGLE_BLOCKING_LAYER",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "empty",
+      "sql": "",
+      "expected": "BLOCK",
+      "rationale": "No query supplied.",
+      "checks": {
+        "lexical": {
+          "decision": "BLOCK",
+          "reason": "EMPTY_SQL"
+        },
+        "ast": {
+          "decision": "BLOCK",
+          "reason": "EMPTY_SQL"
+        }
+      },
+      "variants": {
+        "full": "BLOCK",
+        "without_lexical": "BLOCK",
+        "without_ast": "BLOCK",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [
+        "lexical",
+        "ast"
+      ],
+      "attribution": "REDUNDANT_BLOCK",
+      "full_matches_expectation": true,
+      "database_enforcement": "NOT_TESTED"
+    },
+    {
+      "id": "sleep",
+      "sql": "SELECT pg_sleep(1)",
+      "expected": "BLOCK",
+      "rationale": "Desired analytical policy disallows deliberate delay; a candidate coverage gap, not an existing function restriction.",
+      "checks": {
+        "lexical": {
+          "decision": "PASS",
+          "reason": "VALID"
+        },
+        "ast": {
+          "decision": "PASS",
+          "reason": "AST_VALID"
+        }
+      },
+      "variants": {
+        "full": "PASS",
+        "without_lexical": "PASS",
+        "without_ast": "PASS",
+        "without_both": "PASS"
+      },
+      "blocking_layers": [],
+      "attribution": "NO_VALIDATOR_BLOCK",
+      "full_matches_expectation": false,
+      "database_enforcement": "NOT_TESTED"
+    }
+  ]
+}

@@ -4,10 +4,6 @@ import sqlparse
 import sqlglot
 from sqlglot import exp
 
-from app.schema import (
-    ALLOWED_TABLES,
-    discovered_columns
-)
 
 
 BLOCKED_KEYWORDS = {
@@ -89,7 +85,7 @@ def validate_readonly_sql(
     )
 
 
-    for keyword in BLOCKED_KEYWORDS:
+    for keyword in sorted(BLOCKED_KEYWORDS):
 
         if re.search(
             rf"\b{keyword}\b",
@@ -109,7 +105,7 @@ def validate_readonly_sql(
 
 
 def validate_sql_ast(
-    sql
+    sql, *, allowed_tables=None, known_columns=None
 ):
     """
     CTE-aware structural SQL validation.
@@ -196,6 +192,16 @@ def validate_sql_ast(
         )
 
 
+    # Replay can supply a frozen schema without opening a database connection.
+    # Existing callers still resolve the live schema, and configuration failures
+    # propagate rather than falling back to permissive defaults.
+    if allowed_tables is None or known_columns is None:
+        from app.schema import ALLOWED_TABLES, discovered_columns
+        if allowed_tables is None:
+            allowed_tables = ALLOWED_TABLES
+        if known_columns is None:
+            known_columns = discovered_columns
+
     cte_names = set()
 
 
@@ -275,7 +281,7 @@ def validate_sql_ast(
 
     unknown_tables = (
         physical_tables
-        - ALLOWED_TABLES
+        - set(allowed_tables)
     )
 
 
@@ -295,7 +301,7 @@ def validate_sql_ast(
 
 
     physical_table_aliases = set(
-        ALLOWED_TABLES
+        allowed_tables
     )
 
 
@@ -305,7 +311,7 @@ def validate_sql_ast(
 
         if (
             table.name
-            in ALLOWED_TABLES
+            in allowed_tables
         ):
 
             alias = table.alias
@@ -348,7 +354,7 @@ def validate_sql_ast(
 
             if (
                 name
-                not in discovered_columns
+                not in known_columns
             ):
 
                 return (
@@ -364,7 +370,7 @@ def validate_sql_ast(
 
             if (
                 name
-                not in discovered_columns
+                not in known_columns
                 and
                 name
                 not in defined_aliases
@@ -432,3 +438,4 @@ def validate_sql_professional(
         True,
         "PROFESSIONAL_VALID"
     )
+

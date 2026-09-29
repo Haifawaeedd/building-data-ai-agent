@@ -1,0 +1,93 @@
+{
+  "schema_origin": "Synthetic minimal snapshot; not a live PostgreSQL inspection",
+  "schema": {
+    "allowed_tables": [
+      "federal_facilities_energy"
+    ],
+    "known_columns": [
+      "province",
+      "facility",
+      "electricity_total_kwh"
+    ]
+  },
+  "cases": [
+    {
+      "id": "count",
+      "sql": "SELECT COUNT(*) FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "Aggregate read of an allowed table."
+    },
+    {
+      "id": "province",
+      "sql": "SELECT province FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "Known column."
+    },
+    {
+      "id": "cte",
+      "sql": "WITH f AS (SELECT province FROM federal_facilities_energy) SELECT province FROM f",
+      "expected": "PASS",
+      "rationale": "Read-only CTE."
+    },
+    {
+      "id": "comment",
+      "sql": "SELECT province FROM federal_facilities_energy -- DELETE",
+      "expected": "PASS",
+      "rationale": "A comment does not perform deletion."
+    },
+    {
+      "id": "literal",
+      "sql": "SELECT 'DELETE' AS label FROM federal_facilities_energy",
+      "expected": "PASS",
+      "rationale": "A string literal does not perform deletion."
+    },
+    {
+      "id": "delete",
+      "sql": "DELETE FROM federal_facilities_energy",
+      "expected": "BLOCK",
+      "rationale": "State-changing statement."
+    },
+    {
+      "id": "write_cte",
+      "sql": "WITH x AS (DELETE FROM federal_facilities_energy RETURNING *) SELECT * FROM x",
+      "expected": "BLOCK",
+      "rationale": "Data-modifying CTE."
+    },
+    {
+      "id": "multi",
+      "sql": "SELECT 1; SELECT 2",
+      "expected": "BLOCK",
+      "rationale": "Multiple statements violate policy."
+    },
+    {
+      "id": "unknown_table",
+      "sql": "SELECT * FROM other_table",
+      "expected": "BLOCK",
+      "rationale": "Table outside the allowlist."
+    },
+    {
+      "id": "unknown_column",
+      "sql": "SELECT imaginary FROM federal_facilities_energy",
+      "expected": "BLOCK",
+      "rationale": "Column absent from frozen schema."
+    },
+    {
+      "id": "system_schema",
+      "sql": "SELECT * FROM pg_catalog.pg_tables",
+      "expected": "BLOCK",
+      "rationale": "Unapproved schema."
+    },
+    {
+      "id": "empty",
+      "sql": "",
+      "expected": "BLOCK",
+      "rationale": "No query supplied."
+    },
+    {
+      "id": "sleep",
+      "sql": "SELECT pg_sleep(1)",
+      "expected": "BLOCK",
+      "rationale": "Desired analytical policy disallows deliberate delay; a candidate coverage gap, not an existing function restriction."
+    }
+  ]
+}
