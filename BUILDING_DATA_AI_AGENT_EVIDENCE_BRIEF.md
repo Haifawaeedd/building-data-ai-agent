@@ -38,9 +38,9 @@ My Building Data AI Agent project explores how trustworthy AI principles can gov
 | Operational aggregation is implemented | Direct | Source code computes success, repair, latency, outcome, and failure summaries. |
 | v2 diagnostic behavior is regression-tested | Direct but narrow | Five focused tests pass; CI is configured to compile the code and run only this diagnostic test module. |
 | The agent has layered safety controls | Direct for implementation | Code and configuration implement routing, SQL validation, retry bounds, and documented database controls. Runtime enforcement still depends on deployment configuration. |
-| Hold-out performance was strong | Recorded, scoped evidence | CSV artifacts and evaluation documentation report the stated results for a small frozen hold-out under the recorded setup. |
-| Write prompts were behaviorally contained | Recorded, scoped evidence | The five recorded cases generated no SQL and reached no database execution; one routing label was incorrect. |
-| The full v2 stack is end-to-end validated | Not demonstrated | The 11/11 containerized suite predates v2, and the repository explicitly keeps the new tests separate from that figure. |
+| Analytical hold-out results (12 questions) | Limited recorded evidence | CSV artifacts and evaluation documentation report these outcomes for a small frozen hold-out under the recorded setup; the results do not establish broad accuracy or generalization. |
+| Write-oriented hold-out outcomes (5 prompts) | Limited recorded evidence | The five recorded cases generated no SQL and reached no database execution; one routing label was incorrect. |
+| The full v2 stack is end-to-end validated | Environment-dependent; not demonstrated for v2 | The 11/11 containerized suite predates v2, and the repository explicitly keeps the new tests separate from that figure. |
 | The system is production-secure or production-scale | Not demonstrated | There is no penetration test, certification, deployment study, production metrics backend, or load test. |
 | Results generalize to other databases or tasks | Not demonstrated | Evaluation is tied to one schema, one domain, a small hold-out, and nondeterministic external model behavior. |
 
@@ -51,5 +51,5 @@ My Building Data AI Agent project explores how trustworthy AI principles can gov
 ## Reproducibility anchors
 
 - Repository: `Haifawaeedd/building-data-ai-agent`
-- Merged commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
+- PR under review: #2 on `docs/portfolio-evidence-brief`\n- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
 - Evidence files: `README.md`, `docs/EVALUATION.md`, `.github/workflows/ci.yml`, `app/diagnostics.py`, `tests/test_diagnostics.py`, `evaluation/`, and `notebooks/Building_Data_AI_Agent_Production_v2.ipynb`
