@@ -32,6 +32,8 @@ My Building Data AI Agent project explores how trustworthy AI principles can gov
 
 ## Claim-evidence matrix
 
+The evidence is grouped into three classes: direct implementation and focused-test evidence, limited outcomes recorded for specific evaluation samples, and checks that depend on the configured runtime environment.
+
 | Claim | Evidence status | Defensible interpretation |
 |---|---|---|
 | Component-level diagnosis is implemented | Direct | Source code defines observable outcome and failure categories and exposes them through the API. |
@@ -41,7 +43,7 @@ My Building Data AI Agent project explores how trustworthy AI principles can gov
 | Analytical hold-out results (12 questions) | Limited recorded evidence | CSV artifacts and evaluation documentation report these outcomes for a small frozen hold-out under the recorded setup; the results do not establish broad accuracy or generalization. |
 | Write-oriented hold-out outcomes (5 prompts) | Limited recorded evidence | The five recorded cases generated no SQL and reached no database execution; one routing label was incorrect. |
 | The full v2 stack is end-to-end validated | Environment-dependent; not demonstrated for v2 | The 11/11 containerized suite predates v2, and the repository explicitly keeps the new tests separate from that figure. |
-| The system is production-secure or production-scale | Not demonstrated | There is no penetration test, certification, deployment study, production metrics backend, or load test. |
+| The system is production-secure or production-scale | Environment-dependent; not demonstrated | There is no penetration test, certification, deployment study, production metrics backend, or load test. |
 | Results generalize to other databases or tasks | Not demonstrated | Evaluation is tied to one schema, one domain, a small hold-out, and nondeterministic external model behavior. |
 
 ## Safe wording for interviews
