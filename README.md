@@ -14,9 +14,9 @@ A prompt wrapper mainly performs:
 
 This project performs:
 
-`question → semantic preflight → live schema context → SQL generation → AST validation → read-only database tool → bounded repair → grounded synthesis → trace → diagnosis → evaluation`
+`question → semantic preflight → live schema context → SQL generation → AST validation → read-only database tool → bounded repair → deterministic result table with evidence → trace → diagnosis → evaluation`
 
-The harness controls what the model may do, what tools it may reach, when a retry is licensed, when execution must stop, what gets logged, and how failures are classified.
+The harness controls what the model may do, what tools it may reach, when a retry is licensed, when execution must stop, what gets logged, and how failures are classified. Data answers are rendered from query rows with explicit evidence references and a bounded answer license.
 
 ## Architecture
 
@@ -33,10 +33,10 @@ flowchart TD
     V -->|Invalid + retry available| R[Bounded SQL Repair]
     R --> V
 
-    DB -->|Success| S[Database-Grounded Answer Synthesis]
+    DB -->|Success| S[Deterministic Evidence-Checked Result Table]
     DB -->|Failure + retry available| R
 
-    S --> O[Structured Trace + Request Metrics]
+    S --> O[License + Structured Trace]
     C --> O
     O --> D[Component-Level Diagnosis]
     O --> A[Auditable Provenance Ledger]
