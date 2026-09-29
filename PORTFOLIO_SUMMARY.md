@@ -52,5 +52,6 @@ Do not describe this project as “production-proven,” “security-certified,�
 
 ## Evidence anchors
 
-- PR under review: #2 on `docs/portfolio-evidence-brief`\n- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
+- PR under review: #2 on `docs/portfolio-evidence-brief`
+- Pre-PR evidence baseline commit: `11c2119031d0ac73334aa69289afc18946d62b2a`
 - Primary evidence: `README.md`, `docs/EVALUATION.md`, `.github/workflows/ci.yml`, `app/diagnostics.py`, `tests/test_diagnostics.py`, and `evaluation/`
