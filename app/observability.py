@@ -63,6 +63,8 @@ def invoke_agent_observed(question):
             result_truncated=result.get("result_truncated", False),
             sql_generated=result.get("sql") is not None,
             outcome_category=result.get("outcome_category"),
+            answer_license=result.get("answer_license"),
+            withholding_reason=result.get("withholding_reason"),
             failure_category=result.get("failure_category"),
             trace_steps=result.get("trace_steps"),
             trace=result.get("trace", []),

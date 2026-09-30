@@ -1,0 +1,78 @@
+[
+  {
+    "name": "complete_scalar",
+    "request_type": "READ_QUERY",
+    "validation_status": "VALID",
+    "execution_status": "SUCCESS",
+    "rows": [{"total_kwh": 42}],
+    "result_truncated": false,
+    "expected": "RESULT_SUPPORTED"
+  },
+  {
+    "name": "complete_empty_result",
+    "request_type": "READ_QUERY",
+    "validation_status": "VALID",
+    "execution_status": "SUCCESS",
+    "rows": [],
+    "result_truncated": false,
+    "expected": "RESULT_SUPPORTED"
+  },
+  {
+    "name": "database_truncated",
+    "request_type": "READ_QUERY",
+    "validation_status": "VALID",
+    "execution_status": "SUCCESS",
+    "rows": [{"province": "Nova Scotia"}],
+    "result_truncated": true,
+    "expected": "RESULT_BOUNDED"
+  },
+  {
+    "name": "presentation_truncated",
+    "request_type": "READ_QUERY",
+    "validation_status": "VALID",
+    "execution_status": "SUCCESS",
+    "rows": [
+      {"rank": 1}, {"rank": 2}, {"rank": 3}, {"rank": 4},
+      {"rank": 5}, {"rank": 6}, {"rank": 7}, {"rank": 8},
+      {"rank": 9}, {"rank": 10}, {"rank": 11}, {"rank": 12}
+    ],
+    "result_truncated": false,
+    "expected": "RESULT_BOUNDED"
+  },
+  {
+    "name": "validation_blocked",
+    "request_type": "READ_QUERY",
+    "validation_status": "BLOCKED",
+    "execution_status": "NOT_EXECUTED",
+    "rows": [],
+    "result_truncated": false,
+    "expected": "WITHHELD"
+  },
+  {
+    "name": "execution_failed",
+    "request_type": "READ_QUERY",
+    "validation_status": "VALID",
+    "execution_status": "ERROR",
+    "rows": [],
+    "result_truncated": false,
+    "expected": "WITHHELD"
+  },
+  {
+    "name": "ambiguous_question",
+    "request_type": "AMBIGUOUS",
+    "validation_status": null,
+    "execution_status": "NOT_EXECUTED",
+    "rows": [],
+    "result_truncated": false,
+    "expected": "NOT_APPLICABLE"
+  },
+  {
+    "name": "write_request",
+    "request_type": "WRITE_REQUEST",
+    "validation_status": null,
+    "execution_status": "NOT_EXECUTED",
+    "rows": [],
+    "result_truncated": false,
+    "expected": "NOT_APPLICABLE"
+  }
+]

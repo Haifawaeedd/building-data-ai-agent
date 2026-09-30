@@ -14,9 +14,9 @@ A prompt wrapper mainly performs:
 
 This project performs:
 
-`question → semantic preflight → live schema context → SQL generation → AST validation → read-only database tool → bounded repair → grounded synthesis → trace → diagnosis → evaluation`
+`question → semantic preflight → live schema context → SQL generation → AST validation → read-only database tool → bounded repair → deterministic result table with evidence → trace → diagnosis → evaluation`
 
-The harness controls what the model may do, what tools it may reach, when a retry is licensed, when execution must stop, what gets logged, and how failures are classified.
+The harness controls what the model may do, what tools it may reach, when a retry is licensed, when execution must stop, what gets logged, and how failures are classified. Data answers are rendered from query rows with explicit evidence references and a bounded answer license.
 
 ## Architecture
 
@@ -33,10 +33,10 @@ flowchart TD
     V -->|Invalid + retry available| R[Bounded SQL Repair]
     R --> V
 
-    DB -->|Success| S[Database-Grounded Answer Synthesis]
+    DB -->|Success| S[Deterministic Evidence-Checked Result Table]
     DB -->|Failure + retry available| R
 
-    S --> O[Structured Trace + Request Metrics]
+    S --> O[License + Structured Trace]
     C --> O
     O --> D[Component-Level Diagnosis]
     O --> A[Auditable Provenance Ledger]
@@ -128,6 +128,25 @@ API responses can expose:
 
 This turns traces into actionable engineering signals rather than raw logs only.
 
+### Result-supported answer licensing — v0.3
+
+Successful database reads are returned as deterministic result tables rather than
+free-form LLM summaries. The API labels them `RESULT_SUPPORTED` when the
+displayed rows are complete, or `RESULT_BOUNDED` when retrieval or presentation
+limits apply. It withholds data answers when SQL validation or execution fails.
+Policy and clarification messages are labeled `NOT_APPLICABLE`.
+
+Each response includes cell-level references to the displayed database rows and
+the checks used for the license decision. These checks verify that displayed
+values came from an executed, validated read query; they do not independently
+prove that the generated SQL captured the user's intended meaning.
+
+Run the deterministic fixture evaluation with:
+
+```bash
+python evaluation/run_answer_licensing.py
+```
+
 ### Auditable provenance
 
 The provenance path can record:
@@ -211,6 +230,7 @@ app/
 ├── agent.py              # LangGraph execution harness
 ├── config.py
 ├── database.py           # read-only tool boundary
+├── answer_licensing.py   # result evidence and answer licensing
 ├── diagnostics.py        # v2 outcome/failure classification + metrics
 ├── guardrails.py         # sqlglot AST and allowlist checks
 ├── main.py               # FastAPI surface
@@ -224,6 +244,7 @@ notebooks/
 
 tests/
 ├── test_api.py
+├── test_answer_licensing.py
 ├── test_diagnostics.py
 ├── test_guardrails.py
 └── test_routing.py

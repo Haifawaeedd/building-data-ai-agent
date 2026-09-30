@@ -15,7 +15,7 @@ api = FastAPI(
         "Auditable read-only LangGraph Text-to-SQL service for Atlantic "
         "Canada federal-facility energy data."
     ),
-    version="0.2.0",
+    version="0.3.0",
 )
 
 
@@ -40,6 +40,11 @@ class AgentQueryResponse(BaseModel):
     recommended_fix: Optional[str] = None
     trace_steps: Optional[int] = None
     trace: List[str]
+    answer_license: Optional[str] = None
+    answer_evidence: List[dict] = Field(default_factory=list)
+    verification_checks: List[dict] = Field(default_factory=list)
+    withholding_reason: Optional[str] = None
+    license_scope: Optional[str] = None
 
 
 @api.get("/health")
@@ -47,7 +52,7 @@ def health():
     return {
         "status": "ok",
         "service": "building-data-ai-agent",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "database_mode": "read-only",
         "agent_framework": "LangGraph",
         "diagnostics": "component-level",
@@ -106,6 +111,11 @@ def query_agent(request: AgentQueryRequest):
         recommended_fix=result.get("recommended_fix"),
         trace_steps=result.get("trace_steps"),
         trace=result.get("trace", []),
+        answer_license=result.get("answer_license"),
+        answer_evidence=result.get("answer_evidence", []),
+        verification_checks=result.get("verification_checks", []),
+        withholding_reason=result.get("withholding_reason"),
+        license_scope=result.get("license_scope"),
     )
 
 

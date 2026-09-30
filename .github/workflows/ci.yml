@@ -30,3 +30,9 @@ jobs:
 
       - name: Run diagnostic regression tests
         run: pytest -q tests/test_diagnostics.py
+
+      - name: Run answer-licensing regression tests
+        run: pytest -q tests/test_answer_licensing.py
+
+      - name: Run answer-licensing evaluation cases
+        run: python evaluation/run_answer_licensing.py
